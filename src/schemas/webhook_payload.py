@@ -6,4 +6,4 @@ class IncidentWebhook(BaseModel):
     status: str
     error_message: str
     environment: str = "prod"
-    details: Optional[str] = None
+    details: str | None = None
