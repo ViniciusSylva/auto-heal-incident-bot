@@ -1,25 +1,21 @@
-from fastapi import Security, HTTPException, status
-from fastapi.security import APIKeyHeader
+from fastapi import Header, HTTPException, status
 from src.core.config import settings
 
-# Define de onde o FastAPI deve extrair o token nos headers HTTP
-API_KEY_HEADER = APIKeyHeader(name="X-API-Key", auto_error=False)
 
-
-async def verify_api_key(api_key_header: str = Security(API_KEY_HEADER)) -> str:
+async def verify_api_key(x_api_key: str | None = Header(default=None, alias="X-API-Key")) -> str:
     """
-    Dependência que valida se o header X-API-Key bate com a chave configurada.
+    Inspeciona o cabeçalho HTTP 'X-API-Key' e valida se bate com a chave configurada em settings.
     """
-    if not api_key_header:
+    if not x_api_key:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Header 'X-API-Key' ausente na requisição.",
         )
 
-    if api_key_header != settings.API_KEY:
+    if x_api_key != settings.API_KEY:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Chave de API inválida ou não autorizada.",
         )
 
-    return api_key_header
+    return x_api_key
